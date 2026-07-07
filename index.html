@@ -1,204 +1,433 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shopee Affiliate Link Generator</title>
+  <title>Shopee Affiliate Link Generator Pro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 30px 20px;
-      background-color: #f9f9f9;
+    :root {
+      --shopee-orange: #ee4d2d;
+      --shopee-orange-hover: #d73a1c;
+      --glass-bg: rgba(255, 255, 255, 0.1);
+      --glass-border: rgba(255, 255, 255, 0.2);
+      --text-main: #2c3e50;
+      --text-light: #7f8c8d;
     }
-    h2 {
-      color: #ee4d2d;
-      margin-bottom: 20px;
-      font-size: 24px;
-      text-align: center;
-    }
-    .input-field {
-      margin-bottom: 15px;
-    }
-    label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: bold;
-    }
-    input {
-      width: 100%;
-      padding: 10px;
-      font-size: 16px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
+
+    * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
     }
-    button.generate {
-      padding: 12px;
-      font-size: 16px;
-      background-color: #ee4d2d;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
+
+    body {
+      background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: var(--text-main);
+    }
+
+    /* Add a subtle background pattern/gradient */
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
-      margin-top: 10px;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 15% 50%, rgba(238, 77, 45, 0.08), transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(238, 77, 45, 0.12), transparent 25%);
+      z-index: -1;
     }
-    button.generate:hover {
-      background-color: #dd3c1a;
-    }
-    button.generate:disabled {
-      background-color: #f8aa9a;
-      cursor: not-allowed;
-    }
-    .result {
-      margin-top: 25px;
-    }
-    .result-label {
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-    textarea {
+
+    .container {
       width: 100%;
-      height: 80px;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      font-size: 14px;
-      resize: none;
+      max-width: 500px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 40px 30px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+      animation: floatIn 0.6s ease-out forwards;
     }
-    button.copy {
-      background-color: #777;
-      color: white;
-      border: none;
-      padding: 10px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 14px;
-      width: 100%;
-      margin-top: 10px;
+
+    @keyframes floatIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-    button.copy:hover {
-      background-color: #666;
-    }
-    .small {
-      font-size: 14px;
-      color: #666;
-      margin-top: 10px;
+
+    .header {
       text-align: center;
+      margin-bottom: 30px;
     }
-    .note {
-      background-color: #fff3cd;
-      color: #856404;
-      padding: 10px;
-      border-radius: 5px;
-      margin-bottom: 20px;
+
+    .header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--shopee-orange);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .header h1 svg {
+      width: 28px;
+      height: 28px;
+      fill: var(--shopee-orange);
+    }
+
+    .header p {
       font-size: 14px;
+      color: var(--text-light);
     }
-    .loader {
-      display: inline-block;
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text-main);
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-wrapper input {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 15px;
+      border: 2px solid #e1e8ed;
+      border-radius: 12px;
+      outline: none;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .input-wrapper input:focus {
+      border-color: var(--shopee-orange);
+      box-shadow: 0 0 0 4px rgba(238, 77, 45, 0.1);
+    }
+
+    .input-wrapper input::placeholder {
+      color: #aab7c4;
+    }
+
+    .btn-generate {
+      width: 100%;
+      padding: 16px;
+      background-color: var(--shopee-orange);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 14px 0 rgba(238, 77, 45, 0.39);
+      margin-top: 10px;
+    }
+
+    .btn-generate:hover {
+      background-color: var(--shopee-orange-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(238, 77, 45, 0.4);
+    }
+
+    .btn-generate:active {
+      transform: translateY(0);
+    }
+
+    .btn-generate:disabled {
+      background-color: #fca595;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .result-container {
+      margin-top: 30px;
+      padding-top: 25px;
+      border-top: 1px dashed #dcdde1;
+      display: none; /* Hidden by default */
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .result-container.active {
+      display: block;
+    }
+
+    .result-label {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #27ae60;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .result-box {
+      display: flex;
+      gap: 10px;
+    }
+
+    .result-box input {
+      flex: 1;
+      padding: 14px 16px;
+      font-size: 15px;
+      border: 2px solid #27ae60;
+      border-radius: 12px;
+      background-color: #f0fdf4;
+      color: #166534;
+      font-weight: 500;
+      outline: none;
+    }
+
+    .btn-copy {
+      padding: 0 20px;
+      background-color: #2c3e50;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-copy:hover {
+      background-color: #1a252f;
+    }
+
+    .copy-feedback {
+      text-align: center;
+      font-size: 13px;
+      color: #27ae60;
+      margin-top: 10px;
+      font-weight: 500;
+      min-height: 20px;
+    }
+
+    /* Loader Spinner */
+    .spinner {
       width: 20px;
       height: 20px;
-      margin-right: 8px;
-      border: 3px solid rgba(255,255,255,.3);
+      border: 3px solid rgba(255,255,255,0.3);
       border-radius: 50%;
-      border-top-color: white;
+      border-top-color: #fff;
       animation: spin 1s ease-in-out infinite;
-      vertical-align: middle;
+      display: none;
     }
+
+    .btn-generate.loading .spinner {
+      display: inline-block;
+    }
+    .btn-generate.loading .btn-text {
+      display: none;
+    }
+
     @keyframes spin {
       to { transform: rotate(360deg); }
+    }
+
+    .info-box {
+      margin-top: 25px;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-radius: 10px;
+      font-size: 13px;
+      color: #7f8c8d;
+      line-height: 1.5;
+      border-left: 4px solid var(--shopee-orange);
     }
   </style>
 </head>
 <body>
-  <h2>Shopee Affiliate Link Generator</h2>
-  <div class="note" id="note">
-    <strong>Note:</strong> Paste full or shortened Shopee links (e.g., <code>s.shopee.sg/xyz</code>) below.
+
+  <div class="container">
+    <div class="header">
+      <h1>
+        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M16 0c8.837 0 16 7.163 16 16s-7.163 16-16 16S0 24.837 0 16 7.163 0 16 0zm-2.071 21.066c-.34.093-.726.23-1.157.411-.429.18-.83.42-1.205.719-.373.297-.682.685-.928 1.162-.244.475-.367 1.05-.367 1.724 0 .97.23 1.765.688 2.385.459.619 1.15 1.055 2.073 1.309.923.253 2.083.38 3.479.38 1.196 0 2.222-.095 3.08-.285.856-.19 1.572-.444 2.148-.763l-.707-3.031c-.558.307-1.168.539-1.83.697-.661.157-1.393.236-2.195.236-1.155 0-1.956-.103-2.4-.308-.445-.205-.667-.585-.667-1.142 0-.312.11-.564.329-.757.22-.191.564-.33 1.03-.414l5.378-1.025c.875-.168 1.597-.376 2.167-.625.568-.248 1.018-.548 1.35-.9.33-.35.562-.77.696-1.258.133-.487.199-1.068.199-1.74 0-1.092-.257-1.986-.77-2.683-.514-.695-1.255-1.182-2.225-1.46-1.002-.288-2.203-.432-3.606-.432-1.127 0-2.186.082-3.178.246-.991.163-1.895.426-2.712.788l.763 3.035c.67-.32 1.398-.567 2.182-.743.784-.175 1.625-.262 2.522-.262.973 0 1.691.107 2.155.32.463.212.695.592.695 1.14 0 .343-.092.607-.276.793-.183.185-.506.33-1.018.423l-5.321 1.014zM16 2.25c-7.594 0-13.75 6.156-13.75 13.75S8.406 29.75 16 29.75 29.75 23.594 29.75 16 23.594 2.25 16 2.25zm5.556 12.016l-.888-3.084c-.66.216-1.357.378-2.091.488-.732.11-1.503.164-2.312.164-1.397 0-2.529-.164-3.398-.492-.868-.328-1.517-.838-1.946-1.531-.429-.693-.643-1.574-.643-2.645 0-1.016.196-1.849.587-2.497.391-.649.957-1.125 1.697-1.428.74-.303 1.65-.455 2.729-.455.932 0 1.83.09 2.696.27.865.181 1.674.453 2.428.817l-.894 3.09c-.642-.317-1.282-.55-1.921-.7-.638-.15-1.282-.224-1.93-.224-.61 0-1.082.083-1.417.25-.333.165-.568.411-.703.738-.135.326-.202.722-.202 1.19 0 .611.134 1.05.4 1.319.266.269.658.455 1.176.558l5.228 1.015c1.077.208 1.933.528 2.569.96.634.432 1.075.986 1.321 1.663.245.676.368 1.485.368 2.427 0 1.156-.27 2.122-.81 2.898-.539.776-1.332 1.343-2.378 1.7-1.082.368-2.383.552-3.905.552-1.334 0-2.593-.095-3.778-.285-1.185-.19-2.274-.474-3.267-.852l.93-3.153c.801.378 1.65.656 2.547.836.896.18 1.843.27 2.842.27 1.076 0 1.87-.123 2.383-.37.513-.247.769-.714.769-1.402 0-.374-.117-.665-.35-.873-.233-.209-.646-.375-1.238-.499l-5.326-1.037z"/></svg>
+        Affiliate Tool
+      </h1>
+      <p>Tạo link tiếp thị liên kết Shopee nhanh chóng</p>
+    </div>
+
+    <!-- The Affiliate ID is hardcoded in the JS and not shown here -->
+
+    <div class="input-group">
+      <label for="inputLink">Link Sản Phẩm Shopee</label>
+      <div class="input-wrapper">
+        <input type="url" id="inputLink" placeholder="Dán link sản phẩm Shopee gốc vào đây..." required>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label for="subId">Mã Chiến Dịch (Sub ID) <span style="color:var(--text-light); font-weight: 400; font-size:12px;">(Tùy chọn)</span></label>
+      <div class="input-wrapper">
+        <input type="text" id="subId" placeholder="VD: fb-group-san-sale, magg-22">
+      </div>
+    </div>
+
+    <button class="btn-generate" id="generateButton" onclick="generateLink()">
+      <span class="btn-text">Chuyển Đổi Link Ngay</span>
+      <div class="spinner"></div>
+    </button>
+
+    <div class="result-container" id="resultContainer">
+      <div class="result-label">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        Thành công! Link Affiliate của bạn:
+      </div>
+      <div class="result-box">
+        <input type="text" id="resultLink" readonly>
+        <button class="btn-copy" onclick="copyToClipboard()">Copy</button>
+      </div>
+      <div class="copy-feedback" id="copyStatus"></div>
+    </div>
+
+    <div class="info-box">
+      <strong>Lưu ý:</strong> Công cụ sẽ tạo ra link Affiliate Universal. Khi copy và chia sẻ, link này sẽ tự động mở ứng dụng Shopee và ghi nhận hoa hồng kèm mã chiến dịch của bạn.
+    </div>
+
   </div>
-  <div class="input-field">
-    <label for="affiliateIdNumber">Affiliate ID (e.g., <code>14382300002</code>):</label>
-    <input type="text" id="affiliateIdNumber" value="14382300002">
-  </div>
-  <div class="input-field">
-    <label for="inputLink">Shopee Product Link:</label>
-    <input type="text" id="inputLink" placeholder="Paste Shopee product link here">
-  </div>
-  <button class="generate" id="generateButton" onclick="generateLink()">Generate Link</button>
-  <div class="result">
-    <div class="result-label">Affiliate Link:</div>
-    <textarea id="resultLink" readonly></textarea>
-    <button class="copy" onclick="copyToClipboard()">Copy to Clipboard</button>
-    <p class="small" id="copyStatus"></p>
-  </div>
+
   <script>
+    // Hardcoded Affiliate ID as requested to protect user's ID
+    const AFFILIATE_ID = '17376590044';
+
     async function expandLink(url) {
-      const response = await fetch(`/api/expand?url=${encodeURIComponent(url)}`);
-      const data = await response.json();
-      if (data.expandedUrl) return data.expandedUrl;
-      throw new Error(data.error || 'Failed to expand link.');
+      try {
+        const response = await fetch(`/api/expand?url=${encodeURIComponent(url)}`);
+        const data = await response.json();
+        if (data.expandedUrl) return data.expandedUrl;
+        return url; // Fallback to original if API doesn't return expanded
+      } catch (err) {
+        console.warn('Expansion failed, using original url', err);
+        return url;
+      }
     }
-    function generateSubId() {
-      return 'vercel-user-click';
-    }
-    function encodeURL(url) {
-      return encodeURIComponent(url);
-    }
+
     function getCleanBaseURL(url) {
+      // Clean query parameters to avoid conflicts when redirecting
+      // But we must be careful with shopee links that rely on query params for routing.
+      // Usually product links are shopee.vn/product-name-i.shopid.itemid
+      // We will split by '?' to remove tracking params like sp_atk, smtt
       return url.split('?')[0];
     }
+
+
+
     async function generateLink() {
       const input = document.getElementById('inputLink').value.trim();
-      const affiliateId = document.getElementById('affiliateIdNumber').value.trim();
-      const resultArea = document.getElementById('resultLink');
+      let subId = document.getElementById('subId').value.trim();
+      
+      const resultContainer = document.getElementById('resultContainer');
+      const resultInput = document.getElementById('resultLink');
       const copyStatus = document.getElementById('copyStatus');
       const generateButton = document.getElementById('generateButton');
-      if (!input || !affiliateId) {
-        alert('Please fill in all fields.');
+
+      // Reset UI state
+      resultContainer.classList.remove('active');
+      copyStatus.textContent = '';
+      
+      if (!input) {
+        alert('Vui lòng dán link Shopee vào ô trống.');
         return;
       }
+      
+      if (!subId) {
+        subId = 'direct_generate'; // Default tracking subId if left blank
+      }
+
       // Show loading indicator
       generateButton.disabled = true;
-      const originalButtonText = generateButton.innerHTML;
-      generateButton.innerHTML = '<span class="loader"></span> Processing...';
+      generateButton.classList.add('loading');
+
       try {
         let finalUrl = input;
-        if (input.includes('s.shopee.')) {
+        
+        // If it's a short link or redirect link, expand it first
+        if (input.includes('s.shopee') || input.includes('shope.ee')) {
           finalUrl = await expandLink(input);
         }
-        // Get clean base URL without any parameters
+
+        // Clean URL
         finalUrl = getCleanBaseURL(finalUrl);
-        const encoded = encodeURL(finalUrl);
-        const subId = generateSubId();
-        const finalLink = `https://s.shopee.sg/an_redir?origin_link=${encoded}&affiliate_id=${affiliateId}&sub_id=${subId}`;
-        resultArea.value = finalLink;
-        copyStatus.textContent = '';
+        
+        // Decode the URL first to prevent double-encoding (like %25 instead of %)
+        let decodedUrl = finalUrl;
+        try {
+          decodedUrl = decodeURIComponent(finalUrl);
+        } catch (e) {
+          console.warn('Could not decode URI', e);
+        }
+        
+        // Encode URL for the redirect param
+        const encoded = encodeURIComponent(decodedUrl);
+        
+        // Construct standard Universal Affiliate Deep Link
+        const affiliateLink = `https://s.shopee.vn/an_redir?origin_link=${encoded}&affiliate_id=${AFFILIATE_ID}&sub_id=${encodeURIComponent(subId)}`;
+        
+        // Display Result
+        resultInput.value = affiliateLink;
+        resultContainer.classList.add('active');
+
       } catch (err) {
         console.error(err);
-        alert('Error generating link: ' + err.message);
+        alert('Có lỗi xảy ra khi tạo link: ' + err.message);
       } finally {
         // Restore button state
-        generateButton.innerHTML = originalButtonText;
+        generateButton.classList.remove('loading');
         generateButton.disabled = false;
       }
     }
-  async function copyToClipboard() {
-    const resultLink = document.getElementById('resultLink').value;
-    const statusText = document.getElementById('copyStatus');
-    if (!resultLink) {
-      alert('Generate a link first.');
-      return;
+
+    async function copyToClipboard() {
+      const resultLink = document.getElementById('resultLink');
+      const statusText = document.getElementById('copyStatus');
+      
+      resultLink.select();
+      resultLink.setSelectionRange(0, 99999); // For mobile devices
+      
+      try {
+        await navigator.clipboard.writeText(resultLink.value);
+        statusText.textContent = '✅ Đã copy link thành công!';
+        statusText.style.color = '#27ae60';
+      } catch (err) {
+        console.error('Copy failed:', err);
+        statusText.textContent = '❌ Trình duyệt không hỗ trợ copy. Vui lòng copy thủ công.';
+        statusText.style.color = '#e74c3c';
+      }
+      
+      // Clear message after 3 seconds
+      setTimeout(() => {
+        statusText.textContent = '';
+      }, 3000);
     }
-    try {
-      await navigator.clipboard.writeText(resultLink);
-      window.open(resultLink, '_blank'); // Open in new tab
-      statusText.textContent = '✅ Link copied and opened in new tab!';
-    } catch (err) {
-      console.error('Copy failed:', err);
-      statusText.textContent = '❌ Failed to copy. Please try manually.';
-    }
-  }
   </script>
 </body>
 </html>
