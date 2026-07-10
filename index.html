@@ -506,43 +506,22 @@
           }
 
           // If backend fails (e.g. running locally via file:// without Vercel server),
-          // fallback to is.gd using JSONP to bypass CORS.
-          return new Promise((resolve) => {
-            const callbackName =
-              "isgd_callback_" + Math.round(1000000 * Math.random());
-            let isResolved = false;
-
-            const cleanup = () => {
-              delete window[callbackName];
-              if (script && script.parentNode)
-                script.parentNode.removeChild(script);
-            };
-
-            const safeResolve = (result) => {
-              if (isResolved) return;
-              isResolved = true;
-              cleanup();
-              resolve(result);
-            };
-
-            window[callbackName] = function (data) {
-              if (data && data.shorturl) {
-                safeResolve(data.shorturl);
-              } else {
-                safeResolve(url);
+          // fallback to clck.ru because it supports CORS natively and doesn't block Shopee.
+          try {
+            const fallbackResponse = await fetch(
+              `https://clck.ru/--?url=${encodeURIComponent(url)}`
+            );
+            if (fallbackResponse.ok) {
+              const shortUrl = await fallbackResponse.text();
+              if (shortUrl.startsWith("http")) {
+                return shortUrl;
               }
-            };
+            }
+          } catch (e) {
+            console.warn("Client-side fallback failed:", e);
+          }
 
-            const script = document.createElement("script");
-            script.src = `https://is.gd/create.php?format=json&url=${encodeURIComponent(url)}&callback=${callbackName}`;
-            script.onerror = () => safeResolve(url);
-            script.onload = () => {
-              setTimeout(() => safeResolve(url), 200);
-            };
-            document.body.appendChild(script);
-
-            setTimeout(() => safeResolve(url), 5000);
-          });
+          return url;
         }
 
         static async expandLink(url) {

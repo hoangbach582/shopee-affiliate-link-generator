@@ -10,10 +10,10 @@ export default async function handler(req, res) {
   const KUTT_API_KEY = process.env.KUTT_API_KEY;
 
   if (!KUTT_API_KEY) {
-    console.warn("KUTT_API_KEY is not set. Using free is.gd fallback...");
+    console.warn("KUTT_API_KEY is not set. Using free tinyurl fallback...");
     try {
       const fallbackResponse = await fetch(
-        `https://is.gd/create.php?format=simple&url=${encodeURIComponent(url)}`
+        `https://tinyurl.com/api-create.php?url=${encodeURIComponent(url)}`
       );
       if (fallbackResponse.ok) {
         const fallbackData = await fallbackResponse.text();
@@ -22,7 +22,7 @@ export default async function handler(req, res) {
         }
       }
     } catch (fallbackErr) {
-      console.warn("is.gd fallback failed, returning original URL");
+      console.warn("tinyurl fallback failed, returning original URL");
     }
     // If no API key is provided and fallback fails, gracefully degrade by returning the original long URL
     return res.status(200).json({ shortUrl: url });
