@@ -508,33 +508,10 @@
         }
 
         static async shortenLink(url) {
-          // Try backend API first
+          // Try backend API first. If Kutt is configured, it will shorten it.
+          // Otherwise, it returns the original official Shopee link.
           const backendResult = await this.callApi("shorten", url, "shortUrl");
-          if (
-            backendResult !== url &&
-            !backendResult.startsWith("http://localhost") &&
-            !backendResult.startsWith("file://")
-          ) {
-            return backendResult;
-          }
-
-          // If backend fails (e.g. running locally via file:// without Vercel server),
-          // fallback to clck.ru because it supports CORS natively and doesn't block Shopee.
-          try {
-            const fallbackResponse = await fetch(
-              `https://clck.ru/--?url=${encodeURIComponent(url)}`
-            );
-            if (fallbackResponse.ok) {
-              const shortUrl = await fallbackResponse.text();
-              if (shortUrl.startsWith("http")) {
-                return shortUrl;
-              }
-            }
-          } catch (e) {
-            console.warn("Client-side fallback failed:", e);
-          }
-
-          return url;
+          return backendResult;
         }
 
         static async expandLink(url) {
