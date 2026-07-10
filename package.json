@@ -1,0 +1,26 @@
+{
+  "name": "shopee-affiliate-link-generator",
+  "version": "1.0.0",
+  "description": "A simple tool to help you generate Shopee affiliate links instantly by just pasting a product URL and entering your affiliate ID.",
+  "main": "test_url.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hoangbach582/shopee-affiliate-link-generator.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hoangbach582/shopee-affiliate-link-generator/issues"
+  },
+  "homepage": "https://github.com/hoangbach582/shopee-affiliate-link-generator#readme",
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.8",
+    "prettier": "^3.9.5"
+  }
+}
