@@ -16,10 +16,21 @@ export default async function handler(req, res) {
       redirect: "manual", // Prevent Node.js fetch from automatically following the redirect
     });
 
-    // HTTP 301/302 will have the destination URL in the 'location' header
-    const location = response.headers.get("location");
+    let location = response.headers.get("location");
 
     if (location) {
+      // 1. Intercept TinyURL's Viglink Ads/Tracking
+      // If TinyURL tries to route us through viglink, we extract the pure URL and bypass it!
+      if (location.includes("viglink.com")) {
+        try {
+          const urlObj = new URL(location);
+          const targetUrl = urlObj.searchParams.get("u");
+          if (targetUrl) location = targetUrl;
+        } catch (e) {
+          console.warn("Failed to parse viglink url");
+        }
+      }
+
       // Secretly redirect the user directly to the original Shopee link,
       // completely bypassing any interstitial pages or viglink injection from TinyURL.
       return res.redirect(301, location);
