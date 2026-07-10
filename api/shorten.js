@@ -10,8 +10,35 @@ export default async function handler(req, res) {
   const KUTT_API_KEY = process.env.KUTT_API_KEY;
 
   if (!KUTT_API_KEY) {
-    // Return original URL (Official Shopee Deep Link) if no API key is provided,
-    // avoiding any third-party intermediaries.
+    // If no Kutt API key, we use TinyURL as a headless database.
+    try {
+      const fallbackResponse = await fetch(
+        `https://tinyurl.com/api-create.php?url=${encodeURIComponent(url)}`
+      );
+      if (fallbackResponse.ok) {
+        const fallbackData = await fallbackResponse.text();
+        if (fallbackData.startsWith("http")) {
+          // Extract the unique ID from TinyURL (e.g., https://tinyurl.com/xyz123 -> xyz123)
+          const tinyId = fallbackData.split("/").pop();
+
+          // Construct our own custom short URL using the current Vercel domain!
+          // We use https if it's not localhost.
+          const protocol = req.headers.host.includes("localhost")
+            ? "http"
+            : "https";
+          const customShortUrl = `${protocol}://${req.headers.host}/go/${tinyId}`;
+
+          return res.status(200).json({ shortUrl: customShortUrl });
+        }
+      }
+    } catch (fallbackErr) {
+      console.warn(
+        "Headless DB fallback failed, returning original URL",
+        fallbackErr
+      );
+    }
+
+    // Fallback to original URL if everything fails
     return res.status(200).json({ shortUrl: url });
   }
 
