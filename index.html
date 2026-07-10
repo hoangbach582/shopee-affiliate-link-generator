@@ -495,7 +495,40 @@
         }
 
         static async shortenLink(url) {
-          return await this.callApi("shorten", url, "shortUrl");
+          // Try backend API first
+          const backendResult = await this.callApi("shorten", url, "shortUrl");
+          if (
+            backendResult !== url &&
+            !backendResult.startsWith("http://localhost") &&
+            !backendResult.startsWith("file://")
+          ) {
+            return backendResult;
+          }
+
+          // If backend fails (e.g. running locally via file:// without Vercel server),
+          // fallback to is.gd using JSONP to bypass CORS.
+          return new Promise((resolve) => {
+            const callbackName =
+              "isgd_callback_" + Math.round(1000000 * Math.random());
+            window[callbackName] = function (data) {
+              delete window[callbackName];
+              if (script.parentNode) script.parentNode.removeChild(script);
+              if (data && data.shorturl) {
+                resolve(data.shorturl);
+              } else {
+                resolve(url); // fallback to original
+              }
+            };
+
+            const script = document.createElement("script");
+            script.src = `https://is.gd/create.php?format=json&url=${encodeURIComponent(url)}&callback=${callbackName}`;
+            script.onerror = () => {
+              delete window[callbackName];
+              if (script.parentNode) script.parentNode.removeChild(script);
+              resolve(url);
+            };
+            document.body.appendChild(script);
+          });
         }
 
         static async expandLink(url) {
