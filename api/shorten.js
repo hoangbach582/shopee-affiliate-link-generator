@@ -10,21 +10,21 @@ export default async function handler(req, res) {
   const KUTT_API_KEY = process.env.KUTT_API_KEY;
 
   if (!KUTT_API_KEY) {
-    console.warn("KUTT_API_KEY is not set. Using free ulvis.net fallback...");
+    console.warn("KUTT_API_KEY is not set. Using free is.gd fallback...");
     try {
-      const ulvisResponse = await fetch(
-        `https://ulvis.net/api.php?url=${encodeURIComponent(url)}`
+      const fallbackResponse = await fetch(
+        `https://is.gd/create.php?format=simple&url=${encodeURIComponent(url)}`
       );
-      if (ulvisResponse.ok) {
-        const ulvisData = await ulvisResponse.text();
-        if (ulvisData.startsWith("http")) {
-          return res.status(200).json({ shortUrl: ulvisData });
+      if (fallbackResponse.ok) {
+        const fallbackData = await fallbackResponse.text();
+        if (fallbackData.startsWith("http")) {
+          return res.status(200).json({ shortUrl: fallbackData });
         }
       }
-    } catch (ulvisErr) {
-      console.warn("Ulvis fallback failed, returning original URL");
+    } catch (fallbackErr) {
+      console.warn("is.gd fallback failed, returning original URL");
     }
-    // If no API key is provided and ulvis fails, gracefully degrade by returning the original long URL
+    // If no API key is provided and fallback fails, gracefully degrade by returning the original long URL
     return res.status(200).json({ shortUrl: url });
   }
 
