@@ -510,24 +510,38 @@
           return new Promise((resolve) => {
             const callbackName =
               "isgd_callback_" + Math.round(1000000 * Math.random());
-            window[callbackName] = function (data) {
+            let isResolved = false;
+
+            const cleanup = () => {
               delete window[callbackName];
-              if (script.parentNode) script.parentNode.removeChild(script);
+              if (script && script.parentNode)
+                script.parentNode.removeChild(script);
+            };
+
+            const safeResolve = (result) => {
+              if (isResolved) return;
+              isResolved = true;
+              cleanup();
+              resolve(result);
+            };
+
+            window[callbackName] = function (data) {
               if (data && data.shorturl) {
-                resolve(data.shorturl);
+                safeResolve(data.shorturl);
               } else {
-                resolve(url); // fallback to original
+                safeResolve(url);
               }
             };
 
             const script = document.createElement("script");
             script.src = `https://is.gd/create.php?format=json&url=${encodeURIComponent(url)}&callback=${callbackName}`;
-            script.onerror = () => {
-              delete window[callbackName];
-              if (script.parentNode) script.parentNode.removeChild(script);
-              resolve(url);
+            script.onerror = () => safeResolve(url);
+            script.onload = () => {
+              setTimeout(() => safeResolve(url), 200);
             };
             document.body.appendChild(script);
+
+            setTimeout(() => safeResolve(url), 5000);
           });
         }
 
