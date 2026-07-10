@@ -3,7 +3,20 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
     <title>Shopee Affiliate Link Generator Pro</title>
+
+    <!-- Secret Access Key Protection -->
+    <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      // Đổi 'bach123' thành mật khẩu bạn muốn cấp cho người khác
+      if (urlParams.get("key") !== "bach123") {
+        document.documentElement.innerHTML =
+          '<h1 style="text-align:center;margin-top:20vh;font-family:sans-serif;color:#333;">404 - Page Not Found</h1>';
+        throw new Error("Unauthorized Access");
+      }
+    </script>
+
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
