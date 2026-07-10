@@ -107,7 +107,7 @@
       position: relative;
     }
 
-    .input-wrapper input {
+    .input-wrapper input, .input-wrapper textarea {
       width: 100%;
       padding: 14px 16px;
       font-size: 15px;
@@ -116,14 +116,20 @@
       outline: none;
       transition: all 0.3s ease;
       background: rgba(255, 255, 255, 0.9);
+      font-family: inherit;
     }
 
-    .input-wrapper input:focus {
+    .input-wrapper textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    .input-wrapper input:focus, .input-wrapper textarea:focus {
       border-color: var(--shopee-orange);
       box-shadow: 0 0 0 4px rgba(238, 77, 45, 0.1);
     }
 
-    .input-wrapper input::placeholder {
+    .input-wrapper input::placeholder, .input-wrapper textarea::placeholder {
       color: #aab7c4;
     }
 
@@ -195,7 +201,7 @@
       gap: 10px;
     }
 
-    .result-box input {
+    .result-box textarea {
       flex: 1;
       padding: 14px 16px;
       font-size: 15px;
@@ -205,6 +211,10 @@
       color: #166534;
       font-weight: 500;
       outline: none;
+      resize: vertical;
+      min-height: 150px;
+      font-family: inherit;
+      line-height: 1.5;
     }
 
     .btn-copy {
@@ -276,12 +286,17 @@
       <p>Tạo link tiếp thị liên kết Shopee nhanh chóng</p>
     </div>
 
-    <!-- The Affiliate ID is hardcoded in the JS and not shown here -->
+    <div class="input-group">
+      <label for="affId">Affiliate ID <span style="color:var(--text-light); font-weight: 400; font-size:12px;">(Bắt buộc)</span></label>
+      <div class="input-wrapper">
+        <input type="text" id="affId" placeholder="VD: 17376590044" required>
+      </div>
+    </div>
 
     <div class="input-group">
-      <label for="inputLink">Link Sản Phẩm Shopee</label>
+      <label for="inputText">Nội dung bài viết (chứa link Shopee)</label>
       <div class="input-wrapper">
-        <input type="url" id="inputLink" placeholder="Dán link sản phẩm Shopee gốc vào đây..." required>
+        <textarea id="inputText" placeholder="Dán nội dung bài viết hoặc 1 link Shopee gốc vào đây..." required></textarea>
       </div>
     </div>
 
@@ -303,7 +318,7 @@
         Thành công! Link Affiliate của bạn:
       </div>
       <div class="result-box">
-        <input type="text" id="resultLink" readonly>
+        <textarea id="resultText" readonly></textarea>
         <button class="btn-copy" onclick="copyToClipboard()">Copy</button>
       </div>
       <div class="copy-feedback" id="copyStatus"></div>
@@ -316,8 +331,25 @@
   </div>
 
   <script>
-    // Hardcoded Affiliate ID as requested to protect user's ID
-    const AFFILIATE_ID = '17376590044';
+    // Load saved inputs on startup
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedAffId = localStorage.getItem('shopee_aff_id');
+      const savedSubId = localStorage.getItem('shopee_sub_id');
+      if (savedAffId) document.getElementById('affId').value = savedAffId;
+      if (savedSubId) document.getElementById('subId').value = savedSubId;
+    });
+
+    async function shortenLink(url) {
+      try {
+        const response = await fetch(`/api/shorten?url=${encodeURIComponent(url)}`);
+        const data = await response.json();
+        if (data.shortUrl) return data.shortUrl;
+        return url;
+      } catch (err) {
+        console.warn('Shorten failed', err);
+        return url;
+      }
+    }
 
     async function expandLink(url) {
       try {
@@ -342,58 +374,85 @@
 
 
     async function generateLink() {
-      const input = document.getElementById('inputLink').value.trim();
+      const affId = document.getElementById('affId').value.trim();
+      const input = document.getElementById('inputText').value.trim();
       let subId = document.getElementById('subId').value.trim();
       
       const resultContainer = document.getElementById('resultContainer');
-      const resultInput = document.getElementById('resultLink');
+      const resultText = document.getElementById('resultText');
       const copyStatus = document.getElementById('copyStatus');
       const generateButton = document.getElementById('generateButton');
+
+      if (!affId) {
+        alert('Vui lòng nhập Affiliate ID.');
+        return;
+      }
+
+      if (!input) {
+        alert('Vui lòng dán nội dung chứa link Shopee vào ô trống.');
+        return;
+      }
+      
+      if (!subId) {
+        subId = 'direct_generate';
+      }
+
+      // Save to localStorage
+      localStorage.setItem('shopee_aff_id', affId);
+      localStorage.setItem('shopee_sub_id', subId);
 
       // Reset UI state
       resultContainer.classList.remove('active');
       copyStatus.textContent = '';
       
-      if (!input) {
-        alert('Vui lòng dán link Shopee vào ô trống.');
-        return;
-      }
-      
-      if (!subId) {
-        subId = 'direct_generate'; // Default tracking subId if left blank
-      }
-
       // Show loading indicator
       generateButton.disabled = true;
       generateButton.classList.add('loading');
 
       try {
-        let finalUrl = input;
+        let finalOutput = input;
         
-        // If it's a short link or redirect link, expand it first
-        if (input.includes('s.shopee') || input.includes('shope.ee')) {
-          finalUrl = await expandLink(input);
+        // Regex to match shopee links (including http/https, with or without www)
+        const shopeeRegex = /(https?:\/\/(?:www\.)?(?:shopee\.vn|s\.shopee\.vn|shope\.ee)[^\s]*)/g;
+        
+        const links = [...input.matchAll(shopeeRegex)].map(m => m[0]);
+        
+        if (links.length === 0) {
+          alert('Không tìm thấy link Shopee nào trong nội dung!');
+          generateButton.classList.remove('loading');
+          generateButton.disabled = false;
+          return;
         }
 
-        // Clean URL
-        finalUrl = getCleanBaseURL(finalUrl);
-        
-        // Decode the URL first to prevent double-encoding (like %25 instead of %)
-        let decodedUrl = finalUrl;
-        try {
-          decodedUrl = decodeURIComponent(finalUrl);
-        } catch (e) {
-          console.warn('Could not decode URI', e);
+        // Process each link
+        for (const link of links) {
+          let targetUrl = link;
+          
+          if (link.includes('s.shopee') || link.includes('shope.ee')) {
+            targetUrl = await expandLink(link);
+          }
+
+          targetUrl = getCleanBaseURL(targetUrl);
+          
+          let decodedUrl = targetUrl;
+          try {
+            decodedUrl = decodeURIComponent(targetUrl);
+          } catch (e) {
+            console.warn('Could not decode URI', e);
+          }
+          
+          const encoded = encodeURIComponent(decodedUrl);
+          const affiliateLink = `https://s.shopee.vn/an_redir?origin_link=${encoded}&affiliate_id=${affId}&sub_id=${encodeURIComponent(subId)}`;
+          
+          // Shorten the deep link using TinyURL
+          const shortAffiliateLink = await shortenLink(affiliateLink);
+          
+          // Replace in the text
+          finalOutput = finalOutput.replace(link, shortAffiliateLink);
         }
         
-        // Encode URL for the redirect param
-        const encoded = encodeURIComponent(decodedUrl);
-        
-        // Construct standard Universal Affiliate Deep Link
-        const affiliateLink = `https://s.shopee.vn/an_redir?origin_link=${encoded}&affiliate_id=${AFFILIATE_ID}&sub_id=${encodeURIComponent(subId)}`;
-        
         // Display Result
-        resultInput.value = affiliateLink;
+        resultText.value = finalOutput;
         resultContainer.classList.add('active');
 
       } catch (err) {
@@ -407,7 +466,7 @@
     }
 
     async function copyToClipboard() {
-      const resultLink = document.getElementById('resultLink');
+      const resultLink = document.getElementById('resultText');
       const statusText = document.getElementById('copyStatus');
       
       resultLink.select();
