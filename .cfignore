@@ -1,0 +1,7 @@
+node_modules/
+.git/
+.husky/
+.agents/
+mattpocock_skills/
+*.log
+test_url*.js

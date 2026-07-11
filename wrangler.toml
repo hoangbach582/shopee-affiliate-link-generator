@@ -16,5 +16,5 @@ pages_build_output_dir = "."
 
 [[kv_namespaces]]
 binding = "LINKS_KV"
-id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
-preview_id = "REPLACE_WITH_YOUR_KV_PREVIEW_NAMESPACE_ID"
+id = "b491360b159745a2a69388be2588fdd2"
+preview_id = "9e1c5637efaf4258864df151efd0f460"
