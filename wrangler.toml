@@ -1,0 +1,20 @@
+# Shopee Affiliate Link Generator — Cloudflare Pages + Workers
+
+name = "shopee-affiliate-link-generator"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = "."
+
+# Cloudflare KV Namespace — replaces TinyURL as our link database.
+# Zero-latency reads/writes at the edge. No external API calls needed.
+#
+# SETUP STEPS:
+# 1. Run:  npx wrangler kv namespace create LINKS_KV
+# 2. Copy the "id" from the output and paste it below.
+# 3. Also create a preview namespace for local dev:
+#    npx wrangler kv namespace create LINKS_KV --preview
+#    Copy the "id" and paste it as preview_id below.
+
+[[kv_namespaces]]
+binding = "LINKS_KV"
+id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+preview_id = "REPLACE_WITH_YOUR_KV_PREVIEW_NAMESPACE_ID"

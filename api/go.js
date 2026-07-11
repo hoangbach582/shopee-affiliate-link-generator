@@ -31,9 +31,38 @@ export default async function handler(req, res) {
         }
       }
 
-      // Secretly redirect the user directly to the original Shopee link,
-      // completely bypassing any interstitial pages or viglink injection from TinyURL.
-      return res.redirect(301, location);
+      // CRITICAL FIX: Use a client-side JS redirect instead of HTTP 301.
+      //
+      // WHY: Shopee Affiliate only counts a "click" when the request to
+      // s.shopee.vn/an_redir comes from a real user browser. If we use a
+      // server-side 301 redirect, the final hop to Shopee still originates
+      // from the Vercel server IP — Shopee sees a bot/server, not a human
+      // click, and the click is NOT recorded in the affiliate dashboard.
+      //
+      // By returning an HTML page that does `window.location.href = affiliateUrl`,
+      // the USER'S BROWSER makes the request to Shopee directly, so the click
+      // is counted correctly.
+      const safeLocation = location.replace(/'/g, "%27");
+      res.setHeader("Content-Type", "text/html; charset=utf-8");
+      return res.status(200).send(`<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Đang chuyển hướng...</title>
+    <style>
+      body { font-family: sans-serif; display: flex; align-items: center;
+             justify-content: center; min-height: 100vh; margin: 0;
+             background: #fef3ee; color: #ee4d2d; }
+    </style>
+  </head>
+  <body>
+    <p>⏳ Đang mở Shopee...</p>
+    <script>
+      // Client-side redirect so Shopee counts this as a real browser click
+      window.location.replace('${safeLocation}');
+    </script>
+  </body>
+</html>`);
     } else {
       // If there's no location header, the ID might be invalid.
       return res.status(404).send("Link not found in database.");

@@ -4,6 +4,8 @@
   "description": "A simple tool to help you generate Shopee affiliate links instantly by just pasting a product URL and entering your affiliate ID.",
   "main": "test_url.js",
   "scripts": {
+    "dev": "npx wrangler pages dev . --compatibility-date=2024-01-01",
+    "deploy": "npx wrangler pages deploy .",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "husky"
   },
@@ -21,6 +23,7 @@
   "devDependencies": {
     "husky": "^9.1.7",
     "lint-staged": "^17.0.8",
-    "prettier": "^3.9.5"
+    "prettier": "^3.9.5",
+    "wrangler": "^3.0.0"
   }
 }
